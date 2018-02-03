@@ -6,9 +6,11 @@ block_vps = {}
 
 local ip_info_cache = {}
 
+assert(http_api ~= nil, "Add 'block_vps' to secure.http_mods and restart server")
+
 function sleep(s)
-  local ntime = os.clock() + s
-  repeat until os.clock() > ntime
+	local ntime = os.clock() + s
+	repeat until os.clock() > ntime
 end
 
 local function is_base_64(string)
@@ -65,7 +67,7 @@ local function translate_old_response(ip, response)
 	end
 	new_info.asn = asn
 	new_info.isp = old_info.asn
-	response.data = minetest.write_json(new_info)
+	response.info = new_info
 	return response
 end
 
@@ -82,6 +84,7 @@ local function get_ip_info(ip)
 	local result
 	if is_base_64(API_KEY) then -- check if the API_KEY is a valid base64 string
 		result = sync_http_fetch(generate_request(ip))
+		result.info = minetest.parse_json(result.data)
 	else -- if it's not fallback to the old api that doesn't need it
 		if not warning_issued then
 			warning_issued = true
@@ -103,7 +106,7 @@ local function get_ip_info(ip)
 	end
 	
 	-- Cache IP info
-	info = minetest.parse_json(result.data)
+	info = result.info
 	info.last_update = os.time()
 	ip_info_cache[ip] = info
 	
