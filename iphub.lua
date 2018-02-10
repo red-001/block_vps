@@ -1,5 +1,5 @@
 local ip_hub_api = {}
-local API_KEY = 'MTUzMTo3QmJhQ1k4RFgxV211R3plQ09EY1VYMzJ2VFhCTTN0cg=='
+local API_KEY = 'YOUR_API_KEY_HERE'
 
 local function is_base_64(string)
 	if type(string) == "string" and string ~= "" then
