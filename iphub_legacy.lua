@@ -1,7 +1,9 @@
 local ip_hub_api = {}
 
+local email = "YOUR_EMAIL@example.com"
+
 function ip_hub_api:generate_request(ip)
-	return { url = "http://legacy.iphub.info/api.php?showtype=4&ip=" .. ip }
+	return { url = "http://legacy.iphub.info/api.php?showtype=4&ip=" .. ip .. "&email=" ..email }
 end
 
 function ip_hub_api:is_api_available()
@@ -27,7 +29,7 @@ function ip_hub_api:is_response_valid(response)
 	return true
 end
 
-function ip_hub_api:handle_response_data(data_json)
+function ip_hub_api:handle_response_data(ip, data_json)
 	local data = minetest.parse_json(data_json)
 	local asn = 0
 	local isp_info = string.split(data.asn, " ")
