@@ -5,7 +5,6 @@ function ip_hub_api:generate_request(ip)
 end
 
 function ip_hub_api:is_api_available()
-	print("legacy:is_api_available()")
 	return not self.temp_disable
 end
 
@@ -30,17 +29,17 @@ end
 
 function ip_hub_api:handle_response_data(data_json)
 	local data = minetest.parse_json(data_json)
-	print(dump(data))
 	local asn = 0
 	local isp_info = string.split(data.asn, " ")
 	if isp_info[1] then
 		asn = tonumber(isp_info[1]:sub(3))
 	end
+	isp_info[1] = ""
 	
 	local info = {}
 	info.is_blocked = (data.proxy == 1)
 	info.asn = asn
-	info.isp = data.asn
+	info.isp = table.concat(isp_info, " ")
 	info.hostname = data.hostname
 	if data.countryName ~= "" then
 		info.country = data.countryName

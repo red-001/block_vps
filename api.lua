@@ -101,6 +101,7 @@ end)
 local datasources = {}
 function block_vps.regsiter_datasource(name, api)
 	setmetatable(api, {__index = api_base})
+	api.name = name
 	datasources[name] = api
 end
 
@@ -129,7 +130,7 @@ function block_vps.get_ip_info_sync(ip)
 	-- Check if we already looked up that IP recently and return from cache
 	local info = ip_info_cache[ip]
 	if info then
-		source = datasources[info.api]
+		local source = datasources[info.api]
 		if not source:is_data_stale(info) then
 			return info
 		end

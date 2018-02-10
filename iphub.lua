@@ -15,7 +15,6 @@ function ip_hub_api:generate_request(ip)
 end
 
 function ip_hub_api:is_api_available()
-	print("ip_hub_api:is_api_available()")
 	return is_base_64(API_KEY) and not self.bad_key and not self.temp_disable
 end
 
@@ -44,7 +43,6 @@ end
 function ip_hub_api:handle_response_data(data_json)
 	local info = {}
 	local data = minetest.parse_json(data_json)
-	print(dump(data))
 	info.is_blocked = (data.block == 1)
 	info.isp = data.isp
 	info.asn = data.asn
