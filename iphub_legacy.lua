@@ -31,6 +31,9 @@ end
 
 function ip_hub_api:handle_response_data(ip, data_json)
 	local data = minetest.parse_json(data_json)
+	if not data then
+		return nil
+	end
 	local asn = 0
 	local isp_info = string.split(data.asn, " ")
 	if isp_info[1] then
