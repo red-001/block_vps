@@ -11,7 +11,7 @@ dofile(mod_path .. "/iphub.lua")
 dofile(mod_path .. "/iphub_legacy.lua")
 dofile(mod_path .. "/nastyhosts.lua")
 -- block other mods from register data source till better security code can be written
-block_vps.regsiter_datasource = nil
+block_vps.register_datasource = nil
 
 local function create_reject_message(ip, isp)
 	local message

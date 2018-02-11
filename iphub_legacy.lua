@@ -55,4 +55,4 @@ function ip_hub_api:handle_response_data(ip, data_json)
 	return info
 end
 
-block_vps.regsiter_datasource("iphub_legacy", ip_hub_api)
+block_vps.register_datasource("iphub_legacy", ip_hub_api)

@@ -143,7 +143,7 @@ end)
 
 local datasources = {}
 -- todo: add security checks to this and allow other mods to use it
-function block_vps.regsiter_datasource(name, api)
+function block_vps.register_datasource(name, api)
 	setmetatable(api, {__index = api_base})
 	api.name = name
 	datasources[name] = api
