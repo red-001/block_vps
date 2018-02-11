@@ -4,7 +4,8 @@ assert(http_api ~= nil, "Add 'block_vps' to secure.http_mods and restart server"
 
 local mod_path = core.get_modpath(core.get_current_modname())
 local mod_storage = minetest.get_mod_storage()
-local block_before_login = true -- block users from banned IPs from even attempting to connect, not recommand as it freezes other server activity
+-- block users from banned IPs from even attempting to connect, not recommand as it freezes other server activity
+local block_before_login = core.settings:get_bool("block_vps_block_before_login") or false
 
 assert(loadfile(mod_path .. "/api.lua"))(http_api)
 dofile(mod_path .. "/iphub.lua")
