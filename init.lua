@@ -21,9 +21,9 @@ local function create_reject_message(ip, isp, kicked)
 end
 	
 local function log_block(name, ip, isp, datasource, kicked)
-	local prefix = "Blocking '%s' connecting"
-	if kicked then prefix = "Kicked '%s' connected" end
-	core.log("action", string.format("[block_vps] " .. prefix .. " from '%s' as the IP address appears to belong to '%s' (datasource = %s).", name, ip, isp, datasource))
+	local prefix = "Blocking %q connecting"
+	if kicked then prefix = "Kicked %q connected" end
+	core.log("action", string.format("[block_vps] " .. prefix .. " from %q as the IP address appears to belong to %q (datasource = %q).", name, ip, isp, datasource))
 end
 
 if block_before_login then
@@ -67,3 +67,28 @@ else
 		end)
 	end)
 end
+
+core.register_chatcommand("get_ip_info", {
+	params = "<ip_address>",
+	description = "Display IP address information",
+	privs = {server=true},
+	func = function(name, param)
+		param = param:trim()
+		if param == "" then
+			return false, "IP address needed"
+		end
+		local ip = param:match("^([^ ]+)")
+		block_vps.get_ip_info(ip, function(ip, info)
+			if not info then
+				core.chat_send_player(name, string.format("Failed to get IP info for %q", ip))
+			else
+				local message = string.format("\nIP Info for %q\nData Source: %s\nBlocked: %s\nISP: %q\nASN: %d\nHost Name: %s\n",
+							ip, info.api, tostring(info.is_blocked), info.isp, info.asn, info.hostname)
+				if info.country then
+					message = message .. "Country: " .. info.country .. "\n"
+				end
+				core.chat_send_player(name, message)
+			end
+		end)
+	end,
+})

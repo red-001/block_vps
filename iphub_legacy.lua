@@ -41,7 +41,7 @@ function ip_hub_api:handle_response_data(ip, data_json)
 	local info = {}
 	info.is_blocked = (data.proxy == 1)
 	info.asn = asn
-	info.isp = table.concat(isp_info, " ")
+	info.isp = string.trim(table.concat(isp_info, " "))
 	info.hostname = data.hostname
 	if data.countryName ~= "" then
 		info.country = data.countryName

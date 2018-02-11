@@ -228,6 +228,7 @@ function block_vps.get_ip_info(ip, callback, ...)
 		source = datasources[info.api]
 		if not source:is_data_stale(info) then
 			callback(ip, info, ...)
+			return
 		end
 	end
 	local ignored_datasources = {}
