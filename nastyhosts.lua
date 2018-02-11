@@ -5,7 +5,7 @@ function nasty_hosts_api:generate_request(ip)
 end
 
 function nasty_hosts_api:handle_response_data(ip, data_json)
-	local data = minetest.parse_json(data_json)
+	local data = core.parse_json(data_json)
 	local info = {}
 	info.is_blocked = (data.suggestion == "deny")
 	if data.asn then

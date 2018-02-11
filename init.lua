@@ -4,8 +4,7 @@ assert(http_api ~= nil, "Add 'block_vps' to secure.http_mods and restart server"
 
 local mod_path = core.get_modpath(core.get_current_modname())
 local mod_storage = minetest.get_mod_storage()
--- block users from banned IPs from even attempting to connect, not recommand as it freezes other server activity
-local block_before_login = core.settings:get_bool("block_vps_block_before_login") or false
+local block_type = core.settings:get("block_vps_type") or "activation"
 
 assert(loadfile(mod_path .. "/api.lua"))(http_api)
 dofile(mod_path .. "/iphub.lua")
@@ -14,11 +13,20 @@ dofile(mod_path .. "/nastyhosts.lua")
 -- block other mods from register data source till better security code can be written
 block_vps.regsiter_datasource = nil
 
-local function create_reject_message(ip, isp, kicked)
+local function create_reject_message(ip, isp)
+	local message
+	if block_type ~= "kick" then
+		message = "\nCreating new accounts "
+	else
+		message = "\nConnecting "
+	end
+	message = message .. "from this IP address (%s) is blocked,\nas it appears to be belong to a hosting/VPN/proxy provider (%s)" ..
+				"%s\nplease contact the server owner if this is an error."
 	local note = ","
-	if kicked then note = ".\nConnect from an unblocked IP address to be able to use this account," end
-	return string.format("\nCreating new accounts from this IP address (%s) is blocked,\nas it appears to be belong to a hosting/VPN/proxy provider (%s)" ..
-			"%s\nplease contact the server owner if this is an error.", ip, isp, note)
+	if block_type == "activation" then 
+		note = ".\nConnect from an unblocked IP address to be able to use this account,"
+	end
+	return string.format(message, ip, isp, note)
 end
 	
 local function log_block(name, ip, isp, datasource, kicked)
@@ -27,7 +35,7 @@ local function log_block(name, ip, isp, datasource, kicked)
 	core.log("action", string.format("[block_vps] " .. prefix .. " from %q as the IP address appears to belong to %q (datasource = %q).", name, ip, isp, datasource))
 end
 
-if block_before_login then
+if block_type == "creation" then
 	core.register_on_prejoinplayer(function(name, ip)
 		if not core.player_exists(name) then
 			local ip_info = block_vps.get_ip_info_sync(ip)
@@ -37,15 +45,16 @@ if block_before_login then
 			end
 		end
 	end)
-else
-	core.register_on_prejoinplayer(function(name, ip)
+elseif block_type == "activation" then
+	core.register_on_joinplayer(function(player)
+		local name = player:get_player_name()
 		-- Check if the account has yet to connect from a valid IP
 		if mod_storage:get_int(name) == 1 then
-			block_vps.get_ip_info(ip, function(ip, info)
+			block_vps.get_ip_info(core.get_player_ip(name), function(ip, info)
 				if info and info.is_blocked then
 					-- if the player tries to connect from another banned IP kick and log.
 					log_block(name, ip, info.isp, info.api, true)
-					minetest.kick_player(name, create_reject_message(ip, info.isp, true))
+					minetest.kick_player(name, create_reject_message(ip, info.isp))
 				else
 					mod_storage:set_int(name, 0) -- there doesn't seem to be a function to erase a key?
 				end
@@ -56,7 +65,7 @@ else
 	core.register_on_newplayer(function(player)
 		local name = player:get_player_name()
 		block_vps.get_ip_info(core.get_player_ip(name), function(ip, info)
-			if true or info and info.is_blocked then
+			if info and info.is_blocked then
 				--[[
 					If the IP the player created the account with is banned,
 					kick them, log the event and record that they need to login with a normal IP to use the account in mod storage
@@ -64,6 +73,16 @@ else
 				mod_storage:set_int(name, 1)
 				log_block(name, ip, info.isp, info.api, true)
 				minetest.kick_player(name, create_reject_message(ip, info.isp, true))
+			end
+		end)
+	end)
+elseif block_type == "kick" then
+	core.register_on_joinplayer(function(player)
+		local name = player:get_player_name()
+		block_vps.get_ip_info(core.get_player_ip(name), function(ip, info)
+			if info and info.is_blocked then
+				log_block(name, ip, info.isp, info.api, true)
+				minetest.kick_player(name, create_reject_message(ip, info.isp))
 			end
 		end)
 	end)

@@ -1,13 +1,26 @@
-#    Blocks users from banned IPs from creating accounts instead of disconnecting them afterwards
-#    Not recommanded as it blocks other server activity
-block_vps_block_before_login (block user creation) bool false
+#    Changes how users from blocked IPs are handled:
+#        creation  -  Blocks users from banned IPs from creating accounts
+#        kick  -  Kicks any users that connect from a blacklist IP address
+#        activation  -  Requires all new users to login at least once from a non-blacklist IP
+#        none  -  Do nothing, let other mods handle it
+#    Note: "creation" is not recommanded as it blocks other server activity
+block_vps_type (User block method) enum activation creation,kick,activation,none
 
-#   List of APIs for checking IP addresses against
-#   Listed in the order of preference
-block_vps_datasources (data sources) string iphub, iphub_legacy, nastyhosts
+#   List of APIs for checking IP addresses against.
+#   Listed in the order of preference.
+block_vps_datasources (Data sources) string iphub, iphub_legacy, nastyhosts
 
-#    Contact email, needed by some APIs used as data sources
-block_vps_email (contact email) string your_email@example.com
+#    Contact email, needed by some APIs used as data sources.
+block_vps_email (Contact email) string your_email@example.com
+
+#   How long IP lookups are cached in memory (in-seconds).
+#   May be overriden by certain datasources.
+block_vps_cache_time (Lookup cache time) int 30000
+
+#   How many datasources/APIs should the mod attempt to lookup before aborting.
+#   Higher values increase the chance of an IP being looked up even if some of the APIs fail
+#   but they also increase server load.
+block_vps_max_try (Retry count) int 3
 
 [APIs]
 [*IP Hub]

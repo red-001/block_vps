@@ -42,7 +42,7 @@ end
 
 function ip_hub_api:handle_response_data(ip, data_json)
 	local info = {}
-	local data = minetest.parse_json(data_json)
+	local data = core.parse_json(data_json)
 	info.is_blocked = (data.block == 1)
 	info.isp = data.isp
 	info.asn = data.asn
