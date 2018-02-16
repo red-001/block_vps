@@ -98,6 +98,9 @@ elseif block_type == "activation" then
 elseif block_type == "kick" then
 	core.register_on_joinplayer(function(player)
 		local name = player:get_player_name()
+		if core.check_player_privs(name, {bypass_ip_check=true}) then
+			return
+		end
 		block_vps.get_ip_info(core.get_player_ip(name), function(ip, info)
 			if info and info.is_blocked then
 				log_block(name, ip, info.isp, info.api, true)
@@ -106,6 +109,8 @@ elseif block_type == "kick" then
 		end)
 	end)
 end
+
+core.register_privilege("bypass_ip_check", "Stops the users IP from being check on join by block_vps")
 
 core.register_chatcommand("get_ip_info", {
 	params = "<ip_address>",
