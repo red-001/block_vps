@@ -1,5 +1,5 @@
 local ip_hub_api = {}
-local API_KEY = core.settings:get("iphub_api_key") or 'YOUR_API_KEY_HERE'
+local API_KEY = block_vps.get_setting("iphub_api_key") or 'YOUR_API_KEY_HERE'
 
 local function is_base_64(string)
 	if type(string) == "string" and string ~= "" then

@@ -1,6 +1,6 @@
 local ip_hub_api = {}
 
-local email = core.settings:get("block_vps_email") or "YOUR_EMAIL@example.com"
+local email = block_vps.get_setting("block_vps_email") or "YOUR_EMAIL@example.com"
 
 function ip_hub_api:generate_request(ip)
 	return { url = "http://legacy.iphub.info/api.php?showtype=4&ip=" .. ip .. "&email=" ..email }

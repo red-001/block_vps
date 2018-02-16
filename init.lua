@@ -3,8 +3,23 @@ local http_api = minetest.request_http_api()
 assert(http_api ~= nil, "Add 'block_vps' to secure.http_mods and restart server")
 
 local mod_path = core.get_modpath(core.get_current_modname())
-local mod_storage = minetest.get_mod_storage()
-local block_type = core.settings:get("block_vps_type") or "activation"
+local mod_storage
+
+-- support older minetest versions
+if minetest.get_mod_storage then
+	mod_storage = minetest.get_mod_storage()
+end
+
+-- support older minetest versions
+function block_vps.get_setting(name)
+	if core.settings then
+		return core.settings:get(name)
+	else
+		return core.setting_get(name)
+	end
+end
+
+local block_type = block_vps.get_setting("block_vps_type") or "activation"
 
 assert(loadfile(mod_path .. "/api.lua"))(http_api)
 dofile(mod_path .. "/iphub.lua")
@@ -46,6 +61,10 @@ if block_type == "creation" then
 		end
 	end)
 elseif block_type == "activation" then
+	-- support older minetest versions
+	assert(mod_storage ~= nil, "Your minetest version doesn't support mod storage, " ..
+		"it is required if 'block_vps_type' is set to 'activation' please change it to any other support setting ('none', 'kick', 'creation')")
+	
 	core.register_on_joinplayer(function(player)
 		local name = player:get_player_name()
 		-- Check if the account has yet to connect from a valid IP

@@ -1,8 +1,8 @@
 local api_base = {}
 local http_api = ...
-local cache_time = tonumber(core.settings:get("block_vps_cache_time")) or 30000 -- ~8 hours
-local max_try_count = tonumber(core.settings:get("block_vps_max_try")) or 3 -- how many API do we try to use before aborting
-local enabled_sources = string.split(core.settings:get("block_vps_datasources")
+local cache_time = tonumber(block_vps.get_setting("block_vps_cache_time")) or 30000 -- ~8 hours
+local max_try_count = tonumber(block_vps.get_setting("block_vps_max_try")) or 3 -- how many API do we try to use before aborting
+local enabled_sources = string.split(block_vps.get_setting("block_vps_datasources")
 	or "iphub, iphub_legacy, nastyhosts", ",")
 
 local function gen_stub(name)
