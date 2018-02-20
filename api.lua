@@ -213,7 +213,7 @@ local function get_info_async(ip, callback, try_count, ignored_datasources, ...)
 				table.insert(ignored_datasources, name)
 				get_info_async(ip, callback, try_count, ignored_datasources, ...)
 			else
-				-- might be better to return stale information if aviable?
+				-- might be better to return stale information if available?
 				ip_info_cache[ip] = ip_info
 				callback(ip, ip_info, ...)
 			end
@@ -225,7 +225,7 @@ function block_vps.get_ip_info(ip, callback, ...)
 	-- Check if we already looked up that IP recently and return from cache
 	local info = ip_info_cache[ip]
 	if info then
-		source = datasources[info.api]
+		local source = datasources[info.api]
 		if not source:is_data_stale(info) then
 			callback(ip, info, ...)
 			return
