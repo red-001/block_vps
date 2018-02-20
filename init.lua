@@ -75,7 +75,7 @@ elseif block_type == "activation" then
 					log_block(name, ip, info.isp, info.api, true)
 					minetest.kick_player(name, create_reject_message(ip, info.isp))
 				else
-					mod_storage:set_int(name, 0) -- there doesn't seem to be a function to erase a key?
+					mod_storage:set_string(name, "") -- only way to erase a mod storage key
 				end
 			end)
 		end
