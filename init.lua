@@ -65,6 +65,8 @@ elseif block_type == "activation" then
 	assert(mod_storage ~= nil, "Your minetest version doesn't support mod storage, " ..
 		"it is required if 'block_vps_type' is set to 'activation' please change it to any other support setting ('none', 'kick', 'creation')")
 	
+	local default_privs = core.string_to_privs(core.settings:get("default_privs"))
+	
 	core.register_on_joinplayer(function(player)
 		local name = player:get_player_name()
 		-- Check if the account has yet to connect from a valid IP
@@ -75,6 +77,8 @@ elseif block_type == "activation" then
 					log_block(name, ip, info.isp, info.api, true)
 					minetest.kick_player(name, create_reject_message(ip, info.isp))
 				else
+					-- give the player back the default privs we took
+					core.set_player_privs(name, default_privs)
 					mod_storage:set_string(name, "") -- only way to erase a mod storage key
 				end
 			end)
@@ -83,6 +87,8 @@ elseif block_type == "activation" then
 	
 	core.register_on_newplayer(function(player)
 		local name = player:get_player_name()
+		-- revoke all of the players privs so they don't try to exploit the small delay between connection and IP lookup end.
+		core.set_player_privs(name, {})
 		block_vps.get_ip_info(core.get_player_ip(name), function(ip, info)
 			if info and info.is_blocked then
 				--[[
@@ -92,6 +98,9 @@ elseif block_type == "activation" then
 				mod_storage:set_int(name, 1)
 				log_block(name, ip, info.isp, info.api, true)
 				minetest.kick_player(name, create_reject_message(ip, info.isp, true))
+			else
+				-- give the player back the default privs we took
+				core.set_player_privs(name, default_privs)
 			end
 		end)
 	end)
